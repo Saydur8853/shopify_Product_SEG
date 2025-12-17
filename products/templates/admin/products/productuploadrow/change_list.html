@@ -1,0 +1,14 @@
+{% extends "admin/change_list.html" %}
+
+{% block object-tools-items %}
+  <li>
+    <a href="{% url 'admin:products_productuploadrow_import_excel' %}" class="addlink">Import CSV/Excel</a>
+  </li>
+  <li>
+    <a href="{% url 'admin:products_productuploadrow_export' %}?{{ request.GET.urlencode }}" class="viewlink">Export CSV/Excel</a>
+  </li>
+  <li>
+    <a href="{% url 'admin:products_productuploadrow_delete_all' %}" class="deletelink">Delete all rows</a>
+  </li>
+  {{ block.super }}
+{% endblock %}

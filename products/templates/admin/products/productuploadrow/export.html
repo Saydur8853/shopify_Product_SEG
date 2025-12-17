@@ -1,0 +1,19 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+  <h1>{{ title }}</h1>
+
+  {% if total == 0 %}
+    <p>No rows found for the current filters.</p>
+    <p><a href="..">Back</a></p>
+  {% else %}
+    <p>Exporting <strong>{{ total }}</strong> rows from <code>{{ opts.db_table }}</code>.</p>
+
+    <div style="margin-top: 1rem;">
+      <a class="button" href="?format=csv{% if preserved_filters %}&{{ preserved_filters }}{% endif %}">Download CSV</a>
+      <a class="button" href="?format=xlsx{% if preserved_filters %}&{{ preserved_filters }}{% endif %}">Download Excel (.xlsx)</a>
+      <a href=".." class="button cancel-link">Cancel</a>
+    </div>
+  {% endif %}
+{% endblock %}
+

@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+  <h1>{{ title }}</h1>
+
+  {% if total == 0 %}
+    <p>No rows found.</p>
+    <p><a href="..">Back</a></p>
+  {% else %}
+    <p>This will delete <strong>{{ total }}</strong> rows from <code>{{ opts.db_table }}</code>.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div>
+        <label for="id_chunk_size">Chunk size:</label>
+        <input id="id_chunk_size" name="chunk_size" type="number" min="1" value="{{ chunk_size }}" />
+      </div>
+      <div style="margin-top: 1rem;">
+        <input type="submit" class="deletelink" value="Yes, delete all" />
+        <a href=".." class="button cancel-link">Cancel</a>
+      </div>
+    </form>
+  {% endif %}
+{% endblock %}
+
