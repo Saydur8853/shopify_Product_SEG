@@ -116,6 +116,7 @@ class ProductUploadRowAdmin(admin.ModelAdmin):
     ordering = ("-id",)
     actions = ("export_selected_to_shopify_csv",)
     fieldsets = (
+        ("Identifiers", {"fields": ("sku", "barcode")}),
         ("Upload metadata", {"fields": ("uploaded_at",)}),
         (
             "Core product info",
@@ -133,7 +134,6 @@ class ProductUploadRowAdmin(admin.ModelAdmin):
                 )
             },
         ),
-        ("Identifiers", {"fields": ("sku", "barcode")}),
         (
             "Variant options",
             {

@@ -27,6 +27,13 @@ def queryset_to_shopify_xlsx_response(*, queryset, filename_prefix: str = "shopi
         column = getattr(field, "db_column", None) or str(field.verbose_name)
         field_by_column[column] = field.name
 
+    def _coerce_value(value):
+        if value is None:
+            return ""
+        if isinstance(value, bool):
+            return "TRUE" if value else "FALSE"
+        return str(value)
+
     workbook = openpyxl.Workbook(write_only=True)
     sheet = workbook.create_sheet("Products")
 
@@ -36,7 +43,7 @@ def queryset_to_shopify_xlsx_response(*, queryset, filename_prefix: str = "shopi
         for header in headers:
             field_name = field_by_column.get(header)
             value = getattr(obj, field_name) if field_name else ""
-            row.append("" if value is None else str(value))
+            row.append(_coerce_value(value))
         sheet.append(row)
 
     output = BytesIO()

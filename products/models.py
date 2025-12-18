@@ -29,7 +29,7 @@ class ProductUploadRow(models.Model):
     product_category = models.TextField(verbose_name='Product category', db_column='Product category', null=True, blank=True)
     type = models.TextField(verbose_name='Type', db_column='Type', null=True, blank=True)
     tags = models.TextField(verbose_name='Tags', db_column='Tags', null=True, blank=True)
-    published_on_online_store = models.TextField(verbose_name='Published on online store', db_column='Published on online store', null=True, blank=True)
+    published_on_online_store = models.BooleanField(verbose_name='Published on online store', db_column='Published on online store', null=True, blank=True, default=False)
     status = models.TextField(verbose_name='Status', db_column='Status', null=True, blank=True)
 
     # Identifiers
@@ -50,7 +50,7 @@ class ProductUploadRow(models.Model):
     compare_at_price = models.TextField(verbose_name='Compare-at price', db_column='Compare-at price', null=True, blank=True)
     compare_at_price_international = models.TextField(verbose_name='Compare-at price / International', db_column='Compare-at price / International', null=True, blank=True)
     cost_per_item = models.TextField(verbose_name='Cost per item', db_column='Cost per item', null=True, blank=True)
-    charge_tax = models.TextField(verbose_name='Charge tax', db_column='Charge tax', null=True, blank=True)
+    charge_tax = models.BooleanField(verbose_name='Charge tax', db_column='Charge tax', null=True, blank=True, default=False)
     tax_code = models.TextField(verbose_name='Tax code', db_column='Tax code', null=True, blank=True)
 
     # Unit price measures
@@ -62,12 +62,12 @@ class ProductUploadRow(models.Model):
     # Inventory
     inventory_tracker = models.TextField(verbose_name='Inventory tracker', db_column='Inventory tracker', null=True, blank=True)
     inventory_quantity = models.TextField(verbose_name='Inventory quantity', db_column='Inventory quantity', null=True, blank=True)
-    continue_selling_when_out_of_stock = models.TextField(verbose_name='Continue selling when out of stock', db_column='Continue selling when out of stock', null=True, blank=True)
+    continue_selling_when_out_of_stock = models.BooleanField(verbose_name='Continue selling when out of stock', db_column='Continue selling when out of stock', null=True, blank=True, default=False)
 
     # Shipping
     weight_value_grams = models.TextField(verbose_name='Weight value (grams)', db_column='Weight value (grams)', null=True, blank=True)
     weight_unit_for_display = models.TextField(verbose_name='Weight unit for display', db_column='Weight unit for display', null=True, blank=True)
-    requires_shipping = models.TextField(verbose_name='Requires shipping', db_column='Requires shipping', null=True, blank=True)
+    requires_shipping = models.BooleanField(verbose_name='Requires shipping', db_column='Requires shipping', null=True, blank=True, default=False)
     fulfillment_service = models.TextField(verbose_name='Fulfillment service', db_column='Fulfillment service', null=True, blank=True)
 
     # Images
@@ -77,7 +77,7 @@ class ProductUploadRow(models.Model):
     variant_image_url = models.TextField(verbose_name='Variant image URL', db_column='Variant image URL', null=True, blank=True)
 
     # Product type flags
-    gift_card = models.TextField(verbose_name='Gift card', db_column='Gift card', null=True, blank=True)
+    gift_card = models.BooleanField(verbose_name='Gift card', db_column='Gift card', null=True, blank=True, default=False)
 
     # SEO
     seo_title = models.CharField(verbose_name='SEO title', db_column='SEO title', max_length=70, null=True, blank=True)
