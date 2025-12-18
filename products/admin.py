@@ -6,7 +6,7 @@ from django.http import HttpRequest
 from django.shortcuts import redirect, render
 from django.urls import path
 
-from .models import ProductUploadRow, Vendor, ProductImage
+from .models import ProductUploadRow, Vendor
 from .csv_export import queryset_to_shopify_csv_response
 from .excel_import import import_csv_to_model, import_xlsx_to_model, import_xls_to_model
 from .xlsx_export import queryset_to_shopify_xlsx_response
@@ -16,13 +16,10 @@ try:
 except Exception:  # pragma: no cover
     openpyxl = None
 
-
-class ProductImageInline(admin.TabularInline):
-    model = ProductImage
-    fk_name = "product"
-    extra = 0
-    fields = ("product_image_url", "variant_image_url", "image_position", "image_alt_text")
-
+# Customize admin branding
+admin.site.site_header = "GOODDEGG Administration"
+admin.site.site_title = "GOODDEGG Admin"
+admin.site.index_title = "GOODDEGG"
 
 class ProductUploadRowAdminForm(forms.ModelForm):
     class Meta:
@@ -95,6 +92,7 @@ class ProductUploadRowAdmin(admin.ModelAdmin):
     formfield_overrides = {
         dj_models.TextField: {"widget": forms.Textarea(attrs={"rows": 1, "cols": 40, "style": "resize: vertical;"})},
     }
+    readonly_fields = ("uploaded_at",)
     prepopulated_fields = {"url_handle": ("title",)}
     list_display = (
         "id",
@@ -117,7 +115,89 @@ class ProductUploadRowAdmin(admin.ModelAdmin):
     date_hierarchy = "uploaded_at"
     ordering = ("-id",)
     actions = ("export_selected_to_shopify_csv",)
-    inlines = (ProductImageInline,)
+    fieldsets = (
+        ("Upload metadata", {"fields": ("uploaded_at",)}),
+        (
+            "Core product info",
+            {
+                "fields": (
+                    "title",
+                    "url_handle",
+                    "description",
+                    "vendor",
+                    "product_category",
+                    "type",
+                    "tags",
+                    "published_on_online_store",
+                    "status",
+                )
+            },
+        ),
+        ("Identifiers", {"fields": ("sku", "barcode")}),
+        (
+            "Variant options",
+            {
+                "fields": (
+                    "option1_name",
+                    "option1_value",
+                    "option2_name",
+                    "option2_value",
+                    "option3_name",
+                    "option3_value",
+                )
+            },
+        ),
+        (
+            "Pricing and tax",
+            {
+                "fields": (
+                    "price",
+                    "price_international",
+                    "compare_at_price",
+                    "compare_at_price_international",
+                    "cost_per_item",
+                    "charge_tax",
+                    "tax_code",
+                )
+            },
+        ),
+        (
+            "Unit price measures",
+            {
+                "fields": (
+                    "unit_price_total_measure",
+                    "unit_price_total_measure_unit",
+                    "unit_price_base_measure",
+                    "unit_price_base_measure_unit",
+                )
+            },
+        ),
+        ("Inventory", {"fields": ("inventory_tracker", "inventory_quantity", "continue_selling_when_out_of_stock")}),
+        ("Shipping", {"fields": ("weight_value_grams", "weight_unit_for_display", "requires_shipping", "fulfillment_service")}),
+        ("Images", {"fields": ("product_image_url", "image_position", "image_alt_text", "variant_image_url")}),
+        ("Product type flags", {"fields": ("gift_card",)}),
+        ("SEO", {"fields": ("seo_title", "seo_description")}),
+        (
+            "Google Shopping",
+            {
+                "fields": (
+                    "google_shopping_google_product_category",
+                    "google_shopping_gender",
+                    "google_shopping_age_group",
+                    "google_shopping_mpn",
+                    "google_shopping_adwords_grouping",
+                    "google_shopping_adwords_labels",
+                    "google_shopping_condition",
+                    "google_shopping_custom_product",
+                    "google_shopping_custom_label_0",
+                    "google_shopping_custom_label_1",
+                    "google_shopping_custom_label_2",
+                    "google_shopping_custom_label_3",
+                    "google_shopping_custom_label_4",
+                )
+            },
+        ),
+    )
 
     def get_urls(self):
         urls = super().get_urls()

@@ -1,7 +1,8 @@
 {% extends "admin/base_site.html" %}
 
+{% block content_title %}{% if title %}<h1>{{ title }}</h1>{% endif %}{% endblock %}
+
 {% block content %}
-  <h1>{{ title }}</h1>
 
   {% if total == 0 %}
     <p>No rows found.</p>
@@ -21,4 +22,3 @@
     </form>
   {% endif %}
 {% endblock %}
-
