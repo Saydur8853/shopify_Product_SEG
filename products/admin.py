@@ -39,8 +39,8 @@ class ProductUploadRowAdminForm(forms.ModelForm):
             "continue_selling_when_out_of_stock": "TRUE/FALSE.",
             "weight_value_grams": "Weight in grams (number).",
             "requires_shipping": "TRUE/FALSE.",
-            "product_image_url": "Full image URL (https://...).",
-            "variant_image_url": "Variant image URL (optional).",
+            "product_image_url": "Full image URL (https://...). Multiple URLs separated by commas or new lines will create multiple image rows on export.",
+            "variant_image_url": "Variant image URL (optional). Multiple URLs separated by commas or new lines are supported.",
             "seo_title": "Max 70 characters (recommended).",
             "seo_description": "Max 320 characters (recommended).",
         }
