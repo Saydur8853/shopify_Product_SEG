@@ -123,3 +123,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Prevent admin bulk actions / large form submissions from failing when a changelist
 # contains many selectable rows.
 DATA_UPLOAD_MAX_NUMBER_FIELDS = 10000
+
+# Local Ollama configuration (set via environment variables).
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+OLLAMA_MODEL = os.environ.get("OLLAMA_MODEL", "gemini-3-flash-preview:cloud")
+OLLAMA_TIMEOUT = float(os.environ.get("OLLAMA_TIMEOUT", "60"))

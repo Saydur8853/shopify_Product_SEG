@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
 
+from .ai import generate_product_copy
+
 
 class Vendor(models.Model):
     name = models.CharField(max_length=255, unique=True, db_index=True)
@@ -109,8 +111,40 @@ class ProductUploadRow(models.Model):
         cleaned = head.strip()
         return cleaned or None
 
+    @staticmethod
+    def is_blank(value: str | None) -> bool:
+        return value is None or not str(value).strip()
+
+    @staticmethod
+    def build_seo_description(text: str, max_length: int = 320) -> str:
+        compact = " ".join(str(text).split())
+        if len(compact) <= max_length:
+            return compact
+        trimmed = compact[:max_length].rsplit(" ", 1)[0]
+        return trimmed or compact[:max_length]
+
     def save(self, *args, **kwargs):
         self.title = self.normalize_title(self.title)
-        if (not self.url_handle) and self.title:
+        if self.title:
+            needs_ai = (
+                self.is_blank(self.description)
+                or self.is_blank(self.seo_title)
+                or self.is_blank(self.seo_description)
+            )
+            if needs_ai:
+                ai_data = generate_product_copy(self.title)
+                if ai_data:
+                    if self.is_blank(self.description):
+                        self.description = ai_data.get("description") or self.description
+                    if self.is_blank(self.seo_title):
+                        self.seo_title = ai_data.get("seo_title") or self.seo_title
+                    if self.is_blank(self.seo_description):
+                        self.seo_description = ai_data.get("seo_description") or self.seo_description
+            if self.is_blank(self.seo_title):
+                self.seo_title = self.title[:70]
+            if self.is_blank(self.seo_description):
+                source = self.description or self.title
+                self.seo_description = self.build_seo_description(source, 320)
+        if self.is_blank(self.url_handle) and self.title:
             self.url_handle = slugify(self.title)[:255]
         super().save(*args, **kwargs)

@@ -1,12 +1,15 @@
+import json
+
 from django.contrib import admin, messages
 from django import forms
 from django.core.exceptions import PermissionDenied
 from django.db import models as dj_models
-from django.http import HttpRequest
+from django.http import HttpRequest, JsonResponse
 from django.shortcuts import redirect, render
 from django.urls import path
 
 from .models import ProductUploadRow, Vendor
+from .ai import generate_product_copy, generate_product_copy_with_error
 from .csv_export import queryset_to_shopify_csv_response
 from .excel_import import import_csv_to_model, import_xlsx_to_model, import_xls_to_model
 from .xlsx_export import queryset_to_shopify_xlsx_response
@@ -203,6 +206,11 @@ class ProductUploadRowAdmin(admin.ModelAdmin):
         urls = super().get_urls()
         custom_urls = [
             path(
+                "ai-generate/",
+                self.admin_site.admin_view(self.ai_generate_view),
+                name="products_productuploadrow_ai_generate",
+            ),
+            path(
                 "import-excel/",
                 self.admin_site.admin_view(self.import_excel_view),
                 name="products_productuploadrow_import_excel",
@@ -350,9 +358,43 @@ class ProductUploadRowAdmin(admin.ModelAdmin):
         )
         return render(request, "admin/products/productuploadrow/delete_all.html", context)
 
+    def ai_generate_view(self, request: HttpRequest):
+        if not self.has_change_permission(request):
+            raise PermissionDenied
+        if request.method != "POST":
+            return JsonResponse({"error": "POST required."}, status=405)
+
+        data = {}
+        if request.content_type == "application/json":
+            try:
+                data = json.loads(request.body.decode("utf-8") or "{}")
+            except json.JSONDecodeError:
+                return JsonResponse({"error": "Invalid JSON."}, status=400)
+        else:
+            data = request.POST
+
+        title = (data.get("title") or "").strip()
+        if not title:
+            return JsonResponse({"error": "Title is required."}, status=400)
+
+        result, error = generate_product_copy_with_error(title)
+        if not result:
+            client_error = error and (
+                "Title is required" in error
+                or "langchain-ollama is not installed" in error
+                or "OLLAMA" in error
+            )
+            status = 400 if client_error else 502
+            return JsonResponse({"error": error or "AI generation failed."}, status=status)
+
+        return JsonResponse({"data": result})
+
     @admin.action(description="Export selected rows to Shopify CSV")
     def export_selected_to_shopify_csv(self, request: HttpRequest, queryset):
         return queryset_to_shopify_csv_response(queryset=queryset)
+
+    class Media:
+        js = ("products/admin_ai_generate.js",)
 
 
 @admin.register(Vendor)
